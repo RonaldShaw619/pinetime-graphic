@@ -1,0 +1,33 @@
+name: Build PineTime Logo
+
+on:
+  push:
+    paths:
+      - 'logo.png'
+      - '.github/workflows/logo.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build Logo Firmware
+        run: |
+          cargo install --path .
+          mkdir -p output
+          pinetime-logo-loader logo.png > output/logo-firmware.bin
+
+      - name: Upload Firmware
+        uses: actions/upload-artifact@v3
+        with:
+          name: PineTime Boot Logo
+          path: output/logo-firmware.bin
